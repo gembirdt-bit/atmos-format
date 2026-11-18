@@ -192,15 +192,20 @@ namespace AtmosFormat
             root.Controls.Add(logHost, 0, 4);
 
             // --- podnožje ---
-            var foot = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 2, Margin = new Padding(3, 10, 3, 0) };
+            var foot = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 3, Margin = new Padding(3, 10, 3, 0) };
             foot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            foot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             foot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             var ver = Assembly.GetExecutingAssembly().GetName().Version;
             foot.Controls.Add(new Label { Text = "Atmos Format " + ver.ToString(3) + " · Željko Ilić · Gemb-Bit", AutoSize = true, ForeColor = MUTED, Margin = new Padding(3, 8, 3, 3) }, 0, 0);
             var coffee = new Button();
             Style(coffee, "☕ Doniraj autoru", false);
             coffee.Click += (s, e) => { using (var f = new DonateForm()) f.ShowDialog(this); };
-            foot.Controls.Add(coffee, 1, 0);
+            var apps = new Button();
+            Style(apps, "📱 Sve Atmos aplikacije", false);
+            apps.Click += (s, e) => { try { Process.Start(new ProcessStartInfo("https://gembirdt-bit.github.io/atmosaplikacije/") { UseShellExecute = true }); } catch { } };
+            foot.Controls.Add(apps, 1, 0);
+            foot.Controls.Add(coffee, 2, 0);
             root.Controls.Add(foot, 0, 5);
 
             Shown += (s, e) => Reload();
