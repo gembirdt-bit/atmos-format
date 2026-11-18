@@ -197,7 +197,7 @@ namespace AtmosFormat
             foot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             foot.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             var ver = Assembly.GetExecutingAssembly().GetName().Version;
-            foot.Controls.Add(new Label { Text = "Atmos Format " + ver.ToString(3) + " · Željko Ilić · Gemb-Bit", AutoSize = true, ForeColor = MUTED, Margin = new Padding(3, 8, 3, 3) }, 0, 0);
+            foot.Controls.Add(new Label { Text = "Atmos Format " + ver.ToString(3) + " · zeljkoracunariborca", AutoSize = true, ForeColor = MUTED, Margin = new Padding(3, 8, 3, 3) }, 0, 0);
             var coffee = new Button();
             Style(coffee, "☕ Doniraj autoru", false);
             coffee.Click += (s, e) => { using (var f = new DonateForm()) f.ShowDialog(this); };

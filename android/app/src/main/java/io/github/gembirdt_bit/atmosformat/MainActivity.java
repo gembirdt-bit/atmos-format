@@ -210,7 +210,7 @@ public class MainActivity extends Activity {
         foot.addView(apps, alp);
         String ver = "";
         try { ver = getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception ignored) { }
-        TextView vt = text("Atmos Format " + ver + " · Željko Ilić · Gemb-Bit", 12, MUTED, false);
+        TextView vt = text("Atmos Format " + ver + " · zeljkoracunariborca", 12, MUTED, false);
         vt.setGravity(Gravity.CENTER);
         vt.setPadding(0, dp(8), 0, 0);
         foot.addView(vt);

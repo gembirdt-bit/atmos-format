@@ -10,8 +10,8 @@
     <Version>$(AtmosVersion)</Version>
     <Version Condition="'$(Version)' == ''">1.0.0</Version>
     <Product>Atmos Format</Product>
-    <Company>Gemb-Bit</Company>
-    <Copyright>Željko Ilić</Copyright>
+    <Company>zeljkoracunariborca</Company>
+    <Copyright>zeljkoracunariborca</Copyright>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <Nullable>disable</Nullable>
   </PropertyGroup>
