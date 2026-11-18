@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <AssemblyName>AtmosFormat</AssemblyName>
+    <RootNamespace>AtmosFormat</RootNamespace>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>$(AtmosVersion)</Version>
+    <Version Condition="'$(Version)' == ''">1.0.0</Version>
+    <Product>Atmos Format</Product>
+    <Company>Gemb-Bit</Company>
+    <Copyright>Željko Ilić</Copyright>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\qr200.png" LogicalName="qr200.png" />
+    <EmbeddedResource Include="Resources\qr500.png" LogicalName="qr500.png" />
+    <EmbeddedResource Include="Resources\qr1000.png" LogicalName="qr1000.png" />
+    <EmbeddedResource Include="icon.ico" LogicalName="icon.ico" />
+  </ItemGroup>
+</Project>

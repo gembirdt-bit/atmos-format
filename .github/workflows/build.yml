@@ -1,0 +1,92 @@
+# Pravi Atmos Format za Windows (EXE) i Android (APK).
+# Svaka izmena na main → nova verzija u Releases.
+name: Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  VERSION_NAME: 1.0.${{ github.run_number }}
+  VERSION_CODE: ${{ github.run_number }}
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build EXE
+        run: dotnet build windows/AtmosFormat.csproj -c Release -p:AtmosVersion=${{ env.VERSION_NAME }}
+      - run: |
+          mkdir out
+          copy windows\bin\Release\net48\AtmosFormat.exe out\AtmosFormat.exe
+        shell: cmd
+      - uses: actions/upload-artifact@v5
+        with:
+          name: windows
+          path: out/AtmosFormat.exe
+
+  android:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_FILE: ${{ github.workspace }}/release.jks
+      KEY_ALIAS: atmos
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+      - name: Potpisni ključ
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KS_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ] && [ -n "$KS_PW" ]; then
+            echo "$KS_B64" | base64 -d > "$KEYSTORE_FILE"
+            echo "KEYSTORE_PASSWORD=$KS_PW" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Nema tajni ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD — APK je potpisan PRIVREMENIM ključem."
+            PW=privremeni$RANDOM$RANDOM
+            keytool -genkeypair -storetype PKCS12 -keystore "$KEYSTORE_FILE" -alias atmos -keyalg RSA -keysize 2048 \
+              -validity 10000 -storepass "$PW" -keypass "$PW" -dname "CN=Atmos Format"
+            echo "KEYSTORE_PASSWORD=$PW" >> "$GITHUB_ENV"
+          fi
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon assembleRelease
+      - run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk out/AtmosFormat.apk
+      - uses: actions/upload-artifact@v5
+        with:
+          name: android
+          path: out/AtmosFormat.apk
+
+  release:
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION_NAME }}
+          name: Atmos Format ${{ env.VERSION_NAME }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          body: |
+            **Windows:** preuzmi `AtmosFormat.exe` i pokreni ga (traži administratorska prava).
+            **Android:** preuzmi `AtmosFormat.apk` i instaliraj ga na telefon.
+          files: |
+            out/AtmosFormat.exe
+            out/AtmosFormat.apk
