@@ -359,8 +359,9 @@ namespace AtmosFormat
 
             var sb = new StringBuilder();
             sb.AppendLine("select disk " + d.Number);
-            sb.AppendLine("attributes disk clear readonly noerr");
-            sb.AppendLine("online disk noerr");
+            // samo kad je potrebno — inače DiskPart prijavi „disk je već online“ i čeka
+            if (now.IsReadOnly) sb.AppendLine("attributes disk clear readonly noerr");
+            if (now.IsOffline) sb.AppendLine("online disk noerr");
             sb.AppendLine("clean");
             sb.AppendLine(gpt ? "convert gpt" : "convert mbr");
             sb.AppendLine("create partition primary");

@@ -19,6 +19,9 @@ final class Formatter {
 
     interface Progress { void on(int pct, String msg); }
 
+    /* veći blokovi = manje komandi preko USB-a = brže (do Androida 9 USB prenos ide u manjim delovima) */
+    static final int BLOCK = android.os.Build.VERSION.SDK_INT >= 28 ? 4 * 1024 * 1024 : 1024 * 1024;
+
     volatile boolean cancel;
     String info = "";
     long badBlocks;
@@ -48,7 +51,7 @@ final class Formatter {
         int base = 0;
         if (full) {
             badBlocks = 0;
-            int per = Math.max(1, (1024 * 1024) / bps);
+            int per = Math.max(1, BLOCK / bps);
             byte[] z = new byte[per * bps];
             byte[] r = new byte[per * bps];
             long t0 = System.currentTimeMillis();
@@ -62,7 +65,7 @@ final class Formatter {
                     if (ok) for (int i = 0; i < n * bps; i++) if (r[i] != 0) { ok = false; break; }
                 }
                 if (!ok) badBlocks++;
-                if ((lba / per) % 16 == 0) {
+                if ((lba / per) % (BLOCK >= 4 * 1024 * 1024 ? 4 : 16) == 0) {
                     long done = lba + n;
                     double el = (System.currentTimeMillis() - t0) / 1000.0;
                     double mbs = el > 0 ? done * (double) bps / el / 1e6 : 0;
@@ -73,7 +76,7 @@ final class Formatter {
                 }
             }
             if (badBlocks > 0)
-                throw new IOException("Pronađeno je " + badBlocks + " MB koji se ne mogu ispravno upisati/pročitati. Disk je neispravan i NIJE formatiran.");
+                throw new IOException("Pronađeno je " + badBlocks + " delova diska koji se ne mogu ispravno upisati/pročitati. Disk je neispravan i NIJE formatiran.");
             base = 85;
         } else {
             // obriši stare particione tabele (početak i kraj diska)
@@ -481,7 +484,7 @@ final class Formatter {
     private void zero(Disk d, long lba, long count) throws IOException { zero(d, lba, count, null); }
 
     private void zero(Disk d, long lba, long count, Done cb) throws IOException {
-        int per = Math.max(1, (512 * 1024) / d.blockSize);
+        int per = Math.max(1, BLOCK / d.blockSize);
         byte[] z = new byte[per * d.blockSize];
         long done = 0;
         while (done < count) {
